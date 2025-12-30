@@ -2,38 +2,70 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Napoleonic Tactics: Final Edition</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2D Napoleonic Tactics</title>
     <style>
-        body { background: #1a1a1a; color: #eee; font-family: 'Courier New', monospace; display: flex; flex-direction: column; align-items: center; margin: 0; height: 100vh; overflow: hidden; }
-        #game-container { position: relative; margin-top: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.8); border: 4px solid #444; }
-        canvas { display: block; background: #3a5f0b; image-rendering: pixelated; cursor: crosshair; }
-        .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 10; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-        .hidden { display: none !important; }
-        #hud { width: 640px; height: 60px; display: flex; justify-content: space-between; align-items: center; background: #222; padding: 0 15px; box-sizing: border-box; border-bottom: 2px solid #555; }
-        #action-panel { display: flex; gap: 5px; opacity: 0.3; pointer-events: none; }
-        #action-panel.active { opacity: 1; pointer-events: all; }
-        button { padding: 8px 12px; font-family: inherit; font-weight: bold; background: #444; color: #fff; border: 2px solid #777; cursor: pointer; }
-        button.active { background: #d4af37; color: #000; border-color: #fff; }
-        #unit-selector { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 20px; }
-        .unit-card { border: 2px solid #555; padding: 10px; text-align: center; cursor: pointer; width: 80px; transition: 0.2s; }
-        .unit-card:hover { border-color: gold; background: #333; }
+        body { margin: 0; background: #222; color: white; font-family: sans-serif; overflow: hidden; }
+        #ui { position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.7); padding: 15px; border-radius: 8px; pointer-events: auto; }
+        #battlefield { width: 100vw; height: 100vh; background: #4a6741; position: relative; cursor: crosshair; }
+        
+        .unit {
+            position: absolute;
+            width: 30px;
+            height: 15px;
+            transform: translate(-50%, -50%);
+            border: 2px solid white;
+            transition: transform 0.2s;
+        }
+        .infantry { background: #3355ff; } /* French Blue */
+        .artillery { background: #555; width: 20px; height: 20px; border-radius: 50%; }
+        .label { font-size: 10px; position: absolute; top: -15px; width: 100px; text-align: center; left: -35px; }
+        
+        button { padding: 10px; cursor: pointer; background: #d4af37; border: none; font-weight: bold; margin-right: 5px; }
+        button:hover { background: #fff; }
     </style>
 </head>
 <body>
 
-    <div id="hud">
-        <div id="turn-indicator">Phase: Setup</div>
-        <div id="action-panel">
-            <button onclick="setFormation('line')" id="btn-line">Line</button>
-            <button onclick="setFormation('column')" id="btn-col">Col</button>
-            <button onclick="setFormation('square')" id="btn-sq">Sqr</button>
-        </div>
-        <button id="end-turn-btn" onclick="endPlayerTurn()" disabled>End Turn</button>
+    <div id="ui">
+        <h3>Command Center</h3>
+        <p>Select unit, then click field to deploy:</p>
+        <button onclick="selectedType = 'infantry'">Line Infantry</button>
+        <button onclick="selectedType = 'artillery'">Grand Battery</button>
+        <p>Units Deployed: <span id="count">0</span></p>
     </div>
 
-    <div id="game-container">
-        <canvas id="gameCanvas" width="640" height="640"></canvas>
-        
+    <div id="battlefield" onclick="deployUnit(event)"></div>
+
+    <script>
+        let selectedType = 'infantry';
+        let unitCount = 0;
+
+        function deployUnit(event) {
+            // Create the unit element
+            const unit = document.createElement('div');
+            unit.className = `unit ${selectedType}`;
+            
+            // Set position based on click
+            unit.style.left = event.clientX + 'px';
+            unit.style.top = event.clientY + 'px';
+            
+            // Add a label
+            const label = document.createElement('div');
+            label.className = 'label';
+            label.innerText = selectedType === 'infantry' ? 'Infantry Reg.' : 'Cannon';
+            unit.appendChild(label);
+            
+            // Add to field
+            document.getElementById('battlefield').appendChild(unit);
+            
+            // Update UI
+            unitCount++;
+            document.getElementById('count').innerText = unitCount;
+        }
+    </script>
+</body>
+</html>
         <div id="screen-selection" class="overlay">
             <h2>Draft Your Army (5 Units)</h2>
             <div id="unit-selector">
