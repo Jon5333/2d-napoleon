@@ -6,7 +6,8 @@
     <title>2D Napoleonic Tactics</title>
     <style>
         body { margin: 0; background: #222; color: white; font-family: sans-serif; overflow: hidden; }
-        #ui { position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.7); padding: 15px; border-radius: 8px; pointer-events: auto; }
+        /* The UI stays on top */
+        #ui { position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.8); padding: 15px; border-radius: 8px; z-index: 100; border: 1px solid #d4af37; }
         #battlefield { width: 100vw; height: 100vh; background: #4a6741; position: relative; cursor: crosshair; }
         
         .unit {
@@ -15,25 +16,55 @@
             height: 15px;
             transform: translate(-50%, -50%);
             border: 2px solid white;
-            transition: transform 0.2s;
         }
-        .infantry { background: #3355ff; } /* French Blue */
+        .infantry { background: #3355ff; } 
         .artillery { background: #555; width: 20px; height: 20px; border-radius: 50%; }
-        .label { font-size: 10px; position: absolute; top: -15px; width: 100px; text-align: center; left: -35px; }
         
-        button { padding: 10px; cursor: pointer; background: #d4af37; border: none; font-weight: bold; margin-right: 5px; }
+        button { padding: 10px; cursor: pointer; background: #d4af37; border: none; font-weight: bold; margin-top: 5px; }
         button:hover { background: #fff; }
+        .restart-btn { background: #aa0000; color: white; margin-top: 15px; }
     </style>
 </head>
 <body>
 
     <div id="ui">
-        <h3>Command Center</h3>
-        <p>Select unit, then click field to deploy:</p>
-        <button onclick="selectedType = 'infantry'">Line Infantry</button>
-        <button onclick="selectedType = 'artillery'">Grand Battery</button>
-        <p>Units Deployed: <span id="count">0</span></p>
+        <h3>General's Map</h3>
+        <button onclick="selectedType = 'infantry'">Select Infantry</button>
+        <button onclick="selectedType = 'artillery'">Select Artillery</button>
+        <hr>
+        <p>Units: <span id="count">0</span></p>
+        <button class="restart-btn" onclick="restartGame()">RESTART BATTLE</button>
     </div>
+
+    <div id="battlefield" onclick="deployUnit(event)"></div>
+
+    <script>
+        let selectedType = 'infantry';
+        let unitCount = 0;
+
+        function deployUnit(event) {
+            // Prevent clicking the UI from placing a unit
+            if (event.target.id !== 'battlefield') return;
+
+            const unit = document.createElement('div');
+            unit.className = `unit ${selectedType}`;
+            unit.style.left = event.clientX + 'px';
+            unit.style.top = event.clientY + 'px';
+            
+            document.getElementById('battlefield').appendChild(unit);
+            unitCount++;
+            document.getElementById('count').innerText = unitCount;
+        }
+
+        function restartGame() {
+            // This clears ONLY the units inside the battlefield
+            document.getElementById('battlefield').innerHTML = '';
+            unitCount = 0;
+            document.getElementById('count').innerText = unitCount;
+        }
+    </script>
+</body>
+</html>
 
     <div id="battlefield" onclick="deployUnit(event)"></div>
 
