@@ -1,50 +1,94 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Napoleon Test</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>2D Napoleonic Tactics</title>
     <style>
-        /* The Battlefield */
-        body { background-color: #4a6741; margin: 0; padding: 20px; color: white; font-family: sans-serif; }
+        body { margin: 0; background: #4a6741; font-family: sans-serif; overflow: hidden; touch-action: none; }
         
-        /* The Menu Box */
-        #menu { 
-            background: white; 
-            color: black; 
-            padding: 20px; 
-            border: 5px solid #000; 
-            display: inline-block;
-            margin-bottom: 20px;
+        /* Restoring your exact Black & Gold Menu Style */
+        #ui { 
+            position: absolute; top: 15px; left: 15px; 
+            background: #0d0d0d; color: white; 
+            padding: 20px; border-radius: 10px; 
+            border: 1px solid #d4af37; z-index: 100;
+            width: 260px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
         }
 
-        .troop {
+        #battlefield { 
+            width: 100vw; height: 100vh; 
+            position: absolute; top: 0; left: 0; 
+            z-index: 1; 
+        }
+
+        /* Unit Styles */
+        .unit {
             position: absolute;
-            width: 15px;
-            height: 15px;
-            background: blue;
-            border: 1px solid white;
+            width: 30px; height: 15px;
+            border: 1.5px solid white;
+            pointer-events: none; /* Allows you to click "through" units */
+            z-index: 5;
+        }
+        .infantry { background: #3355ff; box-shadow: 0 0 5px rgba(0,0,0,0.3); }
+        .artillery { background: #444; border-radius: 50%; width: 18px; height: 18px; }
+
+        /* Button Styling to match your screenshot */
+        .btn-group { display: flex; gap: 5px; margin-bottom: 15px; border-bottom: 1px solid #444; padding-bottom: 15px; }
+        
+        button { 
+            padding: 12px 8px; font-weight: bold; cursor: pointer; border: none; flex: 1;
+        }
+        .btn-inf { background: white; color: black; }
+        .btn-art { background: #d4af37; color: black; }
+        
+        .restart-btn { 
+            background: #990000; color: white; width: 100%; 
+            margin-top: 10px; border-radius: 4px; padding: 12px;
         }
     </style>
 </head>
-<body onclick="spawn(event)">
+<body>
 
-    <div id="menu">
-        <h1 style="margin:0">SYSTEM ONLINE</h1>
-        <p>Click anywhere on the green to place a soldier.</p>
-        <button onclick="window.location.reload()">RESTART GAME</button>
+    <div id="ui">
+        <h2 style="margin:0 0 15px 0; font-size: 22px;">General's Map</h2>
+        
+        <div class="btn-group">
+            <button class="btn-inf" onclick="selectedType = 'infantry'">Select Infantry</button>
+            <button class="btn-art" onclick="selectedType = 'artillery'">Select Artillery</button>
+        </div>
+
+        <div style="font-size: 18px; margin: 10px 0;">Units: <span id="count">0</span></div>
+        
+        <button class="restart-btn" onclick="window.location.reload()">RESTART BATTLE</button>
     </div>
 
+    <div id="battlefield"></div>
+
     <script>
-        function spawn(e) {
-            // Don't spawn a troop if we are clicking the menu buttons
-            if (e.target.closest('#menu')) return;
+        let selectedType = 'infantry';
+        let count = 0;
+        const field = document.getElementById('battlefield');
 
-            const div = document.createElement('div');
-            div.className = 'troop';
-            div.style.left = e.pageX + 'px';
-            div.style.top = e.pageY + 'px';
-            document.body.appendChild(div);
-        }
+        // This handles the clicks/taps on the grass
+        field.addEventListener('pointerdown', function(e) {
+            // Check if we are clicking the background and not the menu
+            if (e.target.id === 'battlefield') {
+                const unit = document.createElement('div');
+                unit.className = `unit ${selectedType}`;
+                
+                // Adjust for centering the unit on the tap
+                unit.style.left = e.clientX + 'px';
+                unit.style.top = e.clientY + 'px';
+                unit.style.transform = 'translate(-50%, -50%)';
+                
+                field.appendChild(unit);
+                
+                count++;
+                document.getElementById('count').innerText = count;
+            }
+        });
     </script>
-
 </body>
 </html>
